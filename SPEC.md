@@ -6,6 +6,8 @@
 - Local model name: `minimadmax:latest`
 - Local alias: `MiniMadMax:latest`
 - Intended direct command: `minimadmax`
+- Codex CLI profile: `minimadmax`
+- Codex CLI wrapper: `codex-minimadmax`
 
 ## Ollama Parameters
 
@@ -37,3 +39,29 @@ MiniMadMax is prompted as a high-autonomy VPS engineering model. It is told to:
 - `Cole-Will-I-Am/new-lab` has been observed with admin access from the VPS through local `gh`.
 
 No credential values are stored in this repository.
+
+## Codex CLI Integration
+
+The installed Codex profile lives at:
+
+```text
+~/.codex/minimadmax.config.toml
+```
+
+Profile contents:
+
+```toml
+model = "minimadmax:latest"
+model_provider = "ollama"
+oss_provider = "ollama"
+model_context_window = 524288
+```
+
+Use it with:
+
+```bash
+codex --profile minimadmax
+codex exec --profile minimadmax "inspect this repo"
+codex-minimadmax
+codex-minimadmax exec "inspect this repo"
+```

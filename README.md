@@ -47,6 +47,33 @@ Repo-style alias:
 ollama run MiniMadMax:latest --think high
 ```
 
+## Use With Codex CLI
+
+The installer adds this Codex profile:
+
+```text
+~/.codex/minimadmax.config.toml
+```
+
+Start interactive Codex with MiniMadMax:
+
+```bash
+codex --profile minimadmax
+```
+
+Run Codex noninteractively with MiniMadMax:
+
+```bash
+codex exec --profile minimadmax "inspect this repo"
+```
+
+Convenience wrapper:
+
+```bash
+codex-minimadmax
+codex-minimadmax exec "inspect this repo"
+```
+
 API call:
 
 ```bash
