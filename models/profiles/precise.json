@@ -1,0 +1,25 @@
+{
+  "name": "precise",
+  "description": "Lower-variance behavior for factual checks, code review, and infrastructure commands.",
+  "models": {
+    "minimadmax": {
+      "parameters": {
+        "num_ctx": 524288,
+        "num_predict": 8192,
+        "temperature": 0.1,
+        "top_p": 0.8,
+        "top_k": 20,
+        "repeat_penalty": 1.08
+      }
+    },
+    "codex-nemotron": {
+      "parameters": {
+        "num_ctx": 262144,
+        "num_predict": 8192,
+        "temperature": 0.08,
+        "top_p": 0.8,
+        "repeat_penalty": 1.08
+      }
+    }
+  }
+}

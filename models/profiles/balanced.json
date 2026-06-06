@@ -1,0 +1,25 @@
+{
+  "name": "balanced",
+  "description": "Default VPS engineering behavior: steady, direct, and reliable.",
+  "models": {
+    "minimadmax": {
+      "parameters": {
+        "num_ctx": 524288,
+        "num_predict": 16384,
+        "temperature": 0.2,
+        "top_p": 0.95,
+        "top_k": 40,
+        "repeat_penalty": 1.05
+      }
+    },
+    "codex-nemotron": {
+      "parameters": {
+        "num_ctx": 262144,
+        "num_predict": 8192,
+        "temperature": 0.15,
+        "top_p": 0.9,
+        "repeat_penalty": 1.05
+      }
+    }
+  }
+}

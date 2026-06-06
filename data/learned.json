@@ -1,0 +1,23 @@
+{
+  "model_counts": {
+    "minimadmax": 1
+  },
+  "notes": [
+    {
+      "model": "minimadmax",
+      "note": "Adapted profiles, outcome logging, and JSON extraction",
+      "outcome": "success",
+      "quality": 4,
+      "task": "port-minimaxine",
+      "timestamp": "2026-06-06T17:24:48.551860+00:00"
+    }
+  ],
+  "outcome_counts": {
+    "success": 1
+  },
+  "session_count": 1,
+  "task_counts": {
+    "port-minimaxine": 1
+  },
+  "version": 1
+}

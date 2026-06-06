@@ -61,6 +61,33 @@ Use this command after prompt/config edits:
 rebuild-ollama-models [all|minimadmax|codex-nemotron|render]
 ```
 
+Profiles adapted from MiniMaxine-style tuning live in:
+
+```text
+models/profiles/
+```
+
+Supported profiles:
+
+- `balanced`: default behavior
+- `precise`: lower variance for review and infrastructure
+- `fast`: smaller context/output budget for quick checks
+- `deep`: larger output budget for planning
+
+Outcome memory adapted from MiniMaxine's self-improver lives in:
+
+```text
+data/outcomes.jsonl
+data/learned.json
+```
+
+Use:
+
+```bash
+model-outcome record --model minimadmax --task coding --outcome success --quality 4 --note "useful result"
+model-outcome status
+```
+
 Plain Ollama model sessions cannot persist their own changes. A tool-enabled agent can edit the source-controlled prompt files, rebuild the model, run smoke checks, and commit the result.
 
 ## Git Execution Boundary

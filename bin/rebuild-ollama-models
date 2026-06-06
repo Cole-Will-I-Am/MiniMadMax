@@ -8,16 +8,51 @@ else
   ROOT_DIR="${MINIMADMAX_ROOT:-/root/ai-lab/MiniMadMax}"
 fi
 
+PROFILE_DIR="$ROOT_DIR/models/profiles"
+ACTIVE_PROFILE_FILE="$PROFILE_DIR/active.json"
+PROFILE="${MODEL_PROFILE:-}"
+
+if [[ -z "$PROFILE" && -f "$ACTIVE_PROFILE_FILE" ]]; then
+  PROFILE="$(jq -r '.profile // "balanced"' "$ACTIVE_PROFILE_FILE")"
+fi
+PROFILE="${PROFILE:-balanced}"
+PROFILE_FILE="$PROFILE_DIR/$PROFILE.json"
+
+param_value() {
+  local model="$1"
+  local key="$2"
+  local fallback="$3"
+
+  if [[ -f "$PROFILE_FILE" ]]; then
+    jq -er --arg model "$model" --arg key "$key" \
+      '.models[$model].parameters[$key] // empty' "$PROFILE_FILE" 2>/dev/null || printf '%s\n' "$fallback"
+  else
+    printf '%s\n' "$fallback"
+  fi
+}
+
+write_active_profile() {
+  mkdir -p "$PROFILE_DIR"
+  jq -n --arg profile "$PROFILE" '{profile: $profile}' > "$ACTIVE_PROFILE_FILE"
+}
+
 render_minimadmax() {
   local modelfile="$ROOT_DIR/Modelfile"
+  local num_ctx num_predict temperature top_p top_k repeat_penalty
+  num_ctx="$(param_value minimadmax num_ctx 524288)"
+  num_predict="$(param_value minimadmax num_predict 16384)"
+  temperature="$(param_value minimadmax temperature 0.2)"
+  top_p="$(param_value minimadmax top_p 0.95)"
+  top_k="$(param_value minimadmax top_k 40)"
+  repeat_penalty="$(param_value minimadmax repeat_penalty 1.05)"
   {
     printf '%s\n\n' 'FROM minimax-m3:cloud'
-    printf '%s\n' 'PARAMETER num_ctx 524288'
-    printf '%s\n' 'PARAMETER num_predict 16384'
-    printf '%s\n' 'PARAMETER temperature 0.2'
-    printf '%s\n' 'PARAMETER top_p 0.95'
-    printf '%s\n' 'PARAMETER top_k 40'
-    printf '%s\n\n' 'PARAMETER repeat_penalty 1.05'
+    printf 'PARAMETER num_ctx %s\n' "$num_ctx"
+    printf 'PARAMETER num_predict %s\n' "$num_predict"
+    printf 'PARAMETER temperature %s\n' "$temperature"
+    printf 'PARAMETER top_p %s\n' "$top_p"
+    printf 'PARAMETER top_k %s\n' "$top_k"
+    printf 'PARAMETER repeat_penalty %s\n\n' "$repeat_penalty"
     printf '%s\n' 'SYSTEM """'
     cat "$ROOT_DIR/models/minimadmax/system.md"
     printf '%s\n' '"""'
@@ -26,13 +61,19 @@ render_minimadmax() {
 
 render_codex_nemotron() {
   local modelfile="$ROOT_DIR/models/codex-nemotron/Modelfile"
+  local num_ctx num_predict temperature top_p repeat_penalty
+  num_ctx="$(param_value codex-nemotron num_ctx 262144)"
+  num_predict="$(param_value codex-nemotron num_predict 8192)"
+  temperature="$(param_value codex-nemotron temperature 0.15)"
+  top_p="$(param_value codex-nemotron top_p 0.9)"
+  repeat_penalty="$(param_value codex-nemotron repeat_penalty 1.05)"
   {
     printf '%s\n\n' 'FROM nemotron-3-ultra:cloud'
-    printf '%s\n' 'PARAMETER num_ctx 262144'
-    printf '%s\n' 'PARAMETER num_predict 8192'
-    printf '%s\n' 'PARAMETER temperature 0.15'
-    printf '%s\n' 'PARAMETER top_p 0.9'
-    printf '%s\n\n' 'PARAMETER repeat_penalty 1.05'
+    printf 'PARAMETER num_ctx %s\n' "$num_ctx"
+    printf 'PARAMETER num_predict %s\n' "$num_predict"
+    printf 'PARAMETER temperature %s\n' "$temperature"
+    printf 'PARAMETER top_p %s\n' "$top_p"
+    printf 'PARAMETER repeat_penalty %s\n\n' "$repeat_penalty"
     printf '%s\n' 'SYSTEM """'
     cat "$ROOT_DIR/models/codex-nemotron/system.md"
     printf '%s\n' '"""'
@@ -54,17 +95,38 @@ create_codex_nemotron() {
 
 usage() {
   cat <<'USAGE'
-Usage: rebuild-ollama-models [all|minimadmax|codex-nemotron|render]
+Usage: rebuild-ollama-models [all|minimadmax|codex-nemotron|render|profiles] [--profile NAME]
 
 Edit these files first:
   models/minimadmax/system.md
   models/codex-nemotron/system.md
+
+Profiles live in:
+  models/profiles/
 
 Then rebuild the target model.
 USAGE
 }
 
 target="${1:-all}"
+if [[ "${2:-}" == "--profile" ]]; then
+  PROFILE="${3:-}"
+  PROFILE_FILE="$PROFILE_DIR/$PROFILE.json"
+elif [[ "$target" == "--profile" ]]; then
+  PROFILE="${2:-}"
+  PROFILE_FILE="$PROFILE_DIR/$PROFILE.json"
+  target="all"
+fi
+
+if [[ "$target" != "profiles" && "$target" != "-h" && "$target" != "--help" && "$target" != "help" ]]; then
+  if [[ ! -f "$PROFILE_FILE" ]]; then
+    echo "Unknown profile: $PROFILE" >&2
+    echo "Available profiles:" >&2
+    find "$PROFILE_DIR" -maxdepth 1 -type f -name '*.json' ! -name active.json -printf '  %f\n' 2>/dev/null | sed 's/\.json$//' >&2
+    exit 2
+  fi
+  write_active_profile
+fi
 
 case "$target" in
   all)
@@ -80,6 +142,9 @@ case "$target" in
   render)
     render_minimadmax
     render_codex_nemotron
+    ;;
+  profiles)
+    find "$PROFILE_DIR" -maxdepth 1 -type f -name '*.json' ! -name active.json -printf '%f\n' | sed 's/\.json$//' | sort
     ;;
   -h|--help|help)
     usage

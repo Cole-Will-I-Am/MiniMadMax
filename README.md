@@ -23,6 +23,8 @@ It also installs a VPS wrapper:
 minimadmax
 codex-nemotron
 rebuild-ollama-models
+model-outcome
+model-json-extract
 ```
 
 ## Run
@@ -142,6 +144,14 @@ rebuild-ollama-models minimadmax
 rebuild-ollama-models codex-nemotron
 ```
 
+Use a profile while rebuilding:
+
+```bash
+rebuild-ollama-models minimadmax --profile precise
+rebuild-ollama-models codex-nemotron --profile deep
+rebuild-ollama-models profiles
+```
+
 Render Modelfiles without registering models:
 
 ```bash
@@ -149,6 +159,36 @@ rebuild-ollama-models render
 ```
 
 This regenerates the Ollama Modelfile and runs `ollama create` for the selected model. Prompt/config changes should be committed to this repository so future sessions retain them.
+
+## Profiles And Outcome Memory
+
+Useful pieces from `Cole-Will-I-Am/MiniMaxine` were adapted here as external mechanisms:
+
+- Tuning profiles in `models/profiles/`
+- Outcome memory in `data/outcomes.jsonl` and `data/learned.json`
+- JSON cleanup helper `model-json-extract`
+
+Profiles:
+
+```text
+balanced  default engineering behavior
+precise   facts, review, shell commands
+fast      quick checks
+deep      broader planning and analysis
+```
+
+Record an outcome after a model-assisted task:
+
+```bash
+model-outcome record --model minimadmax --task coding --outcome success --quality 4 --note "Generated clean patch plan"
+model-outcome status
+```
+
+Extract JSON from noisy model output:
+
+```bash
+ollama run minimadmax:latest "Return JSON..." | model-json-extract
+```
 
 ## Git Operations Boundary
 

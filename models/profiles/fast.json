@@ -1,0 +1,25 @@
+{
+  "name": "fast",
+  "description": "Shorter answers and lower token budgets for quick checks.",
+  "models": {
+    "minimadmax": {
+      "parameters": {
+        "num_ctx": 131072,
+        "num_predict": 4096,
+        "temperature": 0.15,
+        "top_p": 0.9,
+        "top_k": 30,
+        "repeat_penalty": 1.05
+      }
+    },
+    "codex-nemotron": {
+      "parameters": {
+        "num_ctx": 131072,
+        "num_predict": 4096,
+        "temperature": 0.12,
+        "top_p": 0.85,
+        "repeat_penalty": 1.05
+      }
+    }
+  }
+}

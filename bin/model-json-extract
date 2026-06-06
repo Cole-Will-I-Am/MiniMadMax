@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+"""
+Extract the first usable JSON object from model output.
+
+Handles common Ollama cloud model noise: visible Thinking blocks, markdown
+fences, and text before/after the JSON object.
+"""
+
+import json
+import re
+import sys
+
+
+raw = sys.stdin.read()
+marker = "...done thinking."
+idx = raw.find(marker)
+if idx != -1:
+    raw = raw[idx + len(marker):]
+
+raw = re.sub(r"```(?:json)?\s*", "", raw)
+raw = raw.replace("```", "").strip()
+
+try:
+    print(json.dumps(json.loads(raw), sort_keys=True))
+    raise SystemExit(0)
+except json.JSONDecodeError:
+    pass
+
+starts = [i for i, ch in enumerate(raw) if ch == "{"]
+for start in starts:
+    depth = 0
+    in_str = False
+    escaped = False
+    for pos in range(start, len(raw)):
+        ch = raw[pos]
+        if in_str:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                candidate = raw[start:pos + 1]
+                try:
+                    print(json.dumps(json.loads(candidate), sort_keys=True))
+                    raise SystemExit(0)
+                except json.JSONDecodeError:
+                    break
+
+print("ERROR:no_valid_json", file=sys.stderr)
+raise SystemExit(1)
