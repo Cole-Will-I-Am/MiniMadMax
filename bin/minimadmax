@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MODEL="${MINIMADMAX_MODEL:-minimadmax:latest}"
+THINK="${MINIMADMAX_THINK:-high}"
+
+if [[ "$#" -gt 0 ]]; then
+  exec ollama run "$MODEL" --think "$THINK" "$*"
+fi
+
+exec ollama run "$MODEL" --think "$THINK"
