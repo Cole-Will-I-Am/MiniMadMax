@@ -41,6 +41,28 @@ MiniMadMax is prompted as a high-autonomy VPS engineering model. It is told to:
 - never reveal or commit secrets
 - give concrete commands when it is not running inside a tool-enabled host
 
+Prompt source files:
+
+```text
+models/minimadmax/system.md
+models/codex-nemotron/system.md
+```
+
+The generated Ollama Modelfiles are:
+
+```text
+Modelfile
+models/codex-nemotron/Modelfile
+```
+
+Use this command after prompt/config edits:
+
+```bash
+rebuild-ollama-models [all|minimadmax|codex-nemotron|render]
+```
+
+Plain Ollama model sessions cannot persist their own changes. A tool-enabled agent can edit the source-controlled prompt files, rebuild the model, run smoke checks, and commit the result.
+
 ## Known VPS GitHub Context
 
 - Local `gh` authentication exists for `Cole-Will-I-Am`.

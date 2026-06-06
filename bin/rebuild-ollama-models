@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -f "$SCRIPT_ROOT/models/minimadmax/system.md" ]]; then
+  ROOT_DIR="$SCRIPT_ROOT"
+else
+  ROOT_DIR="${MINIMADMAX_ROOT:-/root/ai-lab/MiniMadMax}"
+fi
+
+render_minimadmax() {
+  local modelfile="$ROOT_DIR/Modelfile"
+  {
+    printf '%s\n\n' 'FROM minimax-m3:cloud'
+    printf '%s\n' 'PARAMETER num_ctx 524288'
+    printf '%s\n' 'PARAMETER num_predict 16384'
+    printf '%s\n' 'PARAMETER temperature 0.2'
+    printf '%s\n' 'PARAMETER top_p 0.95'
+    printf '%s\n' 'PARAMETER top_k 40'
+    printf '%s\n\n' 'PARAMETER repeat_penalty 1.05'
+    printf '%s\n' 'SYSTEM """'
+    cat "$ROOT_DIR/models/minimadmax/system.md"
+    printf '%s\n' '"""'
+  } > "$modelfile"
+}
+
+render_codex_nemotron() {
+  local modelfile="$ROOT_DIR/models/codex-nemotron/Modelfile"
+  {
+    printf '%s\n\n' 'FROM nemotron-3-ultra:cloud'
+    printf '%s\n' 'PARAMETER num_ctx 262144'
+    printf '%s\n' 'PARAMETER num_predict 8192'
+    printf '%s\n' 'PARAMETER temperature 0.15'
+    printf '%s\n' 'PARAMETER top_p 0.9'
+    printf '%s\n\n' 'PARAMETER repeat_penalty 1.05'
+    printf '%s\n' 'SYSTEM """'
+    cat "$ROOT_DIR/models/codex-nemotron/system.md"
+    printf '%s\n' '"""'
+  } > "$modelfile"
+}
+
+create_minimadmax() {
+  render_minimadmax
+  ollama pull minimax-m3:cloud
+  ollama create "${MINIMADMAX_MODEL:-minimadmax:latest}" -f "$ROOT_DIR/Modelfile"
+  ollama cp "${MINIMADMAX_MODEL:-minimadmax:latest}" "${MINIMADMAX_ALIAS:-MiniMadMax:latest}"
+}
+
+create_codex_nemotron() {
+  render_codex_nemotron
+  ollama pull nemotron-3-ultra:cloud
+  ollama create "${CODEX_NEMOTRON_MODEL:-codex-nemotron:latest}" -f "$ROOT_DIR/models/codex-nemotron/Modelfile"
+}
+
+usage() {
+  cat <<'USAGE'
+Usage: rebuild-ollama-models [all|minimadmax|codex-nemotron|render]
+
+Edit these files first:
+  models/minimadmax/system.md
+  models/codex-nemotron/system.md
+
+Then rebuild the target model.
+USAGE
+}
+
+target="${1:-all}"
+
+case "$target" in
+  all)
+    create_minimadmax
+    create_codex_nemotron
+    ;;
+  minimadmax)
+    create_minimadmax
+    ;;
+  codex-nemotron)
+    create_codex_nemotron
+    ;;
+  render)
+    render_minimadmax
+    render_codex_nemotron
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

@@ -22,6 +22,7 @@ It also installs a VPS wrapper:
 ```bash
 minimadmax
 codex-nemotron
+rebuild-ollama-models
 ```
 
 ## Run
@@ -124,3 +125,27 @@ bin/codex-nemotron
 ```
 
 The plain Ollama CLI may show visible `Thinking...` output for Nemotron. The `codex-nemotron` wrapper uses `/api/generate` with `think:false` for clean one-shot output.
+
+## Updating Model Prompts
+
+The models cannot mutate themselves during a plain `ollama run` session. Their durable role/personality comes from source-controlled prompt files:
+
+```text
+models/minimadmax/system.md
+models/codex-nemotron/system.md
+```
+
+To change a model's role or behavior, edit the relevant `system.md`, then rebuild:
+
+```bash
+rebuild-ollama-models minimadmax
+rebuild-ollama-models codex-nemotron
+```
+
+Render Modelfiles without registering models:
+
+```bash
+rebuild-ollama-models render
+```
+
+This regenerates the Ollama Modelfile and runs `ollama create` for the selected model. Prompt/config changes should be committed to this repository so future sessions retain them.
