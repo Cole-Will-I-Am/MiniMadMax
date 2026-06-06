@@ -9,6 +9,16 @@
 - Codex CLI profile: `minimadmax`
 - Codex CLI wrapper: `codex-minimadmax`
 
+## Companion Model
+
+- Base model: `nemotron-3-ultra:cloud`
+- Local model name: `codex-nemotron:latest`
+- Intended direct command: `codex-nemotron`
+- Spec path: `models/codex-nemotron/Modelfile`
+- Context: `262144`
+- Use case: slower, deeper VPS engineering and infrastructure assistance
+- Automation note: use `/api/generate` with `think:false` for clean output; plain `ollama run` may display visible `Thinking...` output.
+
 ## Ollama Parameters
 
 ```text

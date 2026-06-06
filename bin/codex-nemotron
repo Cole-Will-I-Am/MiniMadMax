@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MODEL="${CODEX_NEMOTRON_MODEL:-codex-nemotron:latest}"
+OLLAMA_URL="${OLLAMA_URL:-http://127.0.0.1:11434}"
+
+if [[ "$#" -gt 0 ]]; then
+  prompt="$*"
+  jq -n --arg model "$MODEL" --arg prompt "$prompt" \
+    '{model: $model, prompt: $prompt, stream: false, think: false}' |
+    curl -fsS "$OLLAMA_URL/api/generate" -d @- |
+    jq -r '.response'
+  exit 0
+fi
+
+exec ollama run "$MODEL"

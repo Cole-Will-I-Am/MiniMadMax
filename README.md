@@ -2,6 +2,8 @@
 
 MiniMadMax is an Ollama custom model built from `minimax-m3:cloud` for high-autonomy VPS engineering work.
 
+This repository also tracks companion VPS Ollama cloud wrappers, currently `codex-nemotron:latest`.
+
 ## Install
 
 ```bash
@@ -19,6 +21,7 @@ It also installs a VPS wrapper:
 
 ```bash
 minimadmax
+codex-nemotron
 ```
 
 ## Run
@@ -39,6 +42,12 @@ Direct Ollama call:
 
 ```bash
 ollama run minimadmax:latest --think high
+```
+
+CodexNemotron clean one-shot call:
+
+```bash
+codex-nemotron "Summarize the current VPS model inventory."
 ```
 
 Repo-style alias:
@@ -101,3 +110,17 @@ The VPS has local GitHub CLI authentication for `Cole-Will-I-Am`, and Git HTTPS 
 The model specs intentionally do not include token values, passwords, private keys, or other secret material. MiniMadMax is allowed to know that credentialed GitHub access exists on the VPS, but it must not print, store, or commit secrets.
 
 Use HTTPS remotes for Git operations unless SSH host keys have been configured.
+
+## Companion Model: CodexNemotron
+
+`codex-nemotron:latest` is built from `nemotron-3-ultra:cloud` for slower, deeper VPS engineering work.
+
+Files:
+
+```text
+models/codex-nemotron/Modelfile
+models/codex-nemotron/README.md
+bin/codex-nemotron
+```
+
+The plain Ollama CLI may show visible `Thinking...` output for Nemotron. The `codex-nemotron` wrapper uses `/api/generate` with `think:false` for clean one-shot output.
