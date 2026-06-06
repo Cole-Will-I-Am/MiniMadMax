@@ -149,3 +149,17 @@ rebuild-ollama-models render
 ```
 
 This regenerates the Ollama Modelfile and runs `ollama create` for the selected model. Prompt/config changes should be committed to this repository so future sessions retain them.
+
+## Git Operations Boundary
+
+Plain Ollama model runs cannot directly edit files, commit, or push. Even with `ollama run --experimental --experimental-yolo`, MiniMadMax and CodexNemotron may only produce commands or structured change requests; the command transcript may be simulated unless an external tool runner executes it.
+
+For safe Git automation, use a tool-enabled wrapper or Codex session that:
+
+- asks the model for structured file/content/commit-message output
+- validates paths and content
+- applies the change
+- runs `git status`
+- commits and pushes through local `gh`/HTTPS credentials
+
+This was verified against `Cole-Will-I-Am/testy` on 2026-06-06: the models produced commit requests, and the tool-enabled Codex session created and pushed commits `6c01cb2` and `ec50ce9`.

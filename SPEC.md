@@ -63,6 +63,17 @@ rebuild-ollama-models [all|minimadmax|codex-nemotron|render]
 
 Plain Ollama model sessions cannot persist their own changes. A tool-enabled agent can edit the source-controlled prompt files, rebuild the model, run smoke checks, and commit the result.
 
+## Git Execution Boundary
+
+Plain Ollama model sessions cannot directly execute Git operations. A test against `Cole-Will-I-Am/testy` on 2026-06-06 showed:
+
+- `minimadmax:latest` under `ollama run --experimental --experimental-yolo` produced a simulated command transcript and did not change the repository.
+- `codex-nemotron:latest` under the same mode produced shell commands but did not execute them.
+- Both models could produce structured file/content/commit-message requests.
+- A tool-enabled Codex session executed those requests and pushed commits `6c01cb2` and `ec50ce9`.
+
+Use Codex or a dedicated validated wrapper for actual file edits, commits, and pushes.
+
 ## Known VPS GitHub Context
 
 - Local `gh` authentication exists for `Cole-Will-I-Am`.
