@@ -126,7 +126,19 @@ models/codex-nemotron/README.md
 bin/codex-nemotron
 ```
 
-The plain Ollama CLI may show visible `Thinking...` output for Nemotron. The `codex-nemotron` wrapper uses `/api/generate` with `think:false` for clean one-shot output.
+`codex-nemotron` now launches Codex CLI with the `nemotron` profile:
+
+```bash
+codex-nemotron
+codex-nemotron "Summarize the current VPS model inventory."
+codex-nemotron exec "inspect this repo"
+```
+
+To run the raw model without Codex:
+
+```bash
+ollama run codex-nemotron:latest
+```
 
 ## Updating Model Prompts
 

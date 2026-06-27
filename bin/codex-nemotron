@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MODEL="${CODEX_NEMOTRON_MODEL:-codex-nemotron:latest}"
-OLLAMA_URL="${OLLAMA_URL:-http://127.0.0.1:11434}"
+PROFILE="${CODEX_NEMOTRON_PROFILE:-nemotron}"
 
-if [[ "$#" -gt 0 ]]; then
-  prompt="$*"
-  jq -n --arg model "$MODEL" --arg prompt "$prompt" \
-    '{model: $model, prompt: $prompt, stream: false, think: false}' |
-    curl -fsS "$OLLAMA_URL/api/generate" -d @- |
-    jq -r '.response'
-  exit 0
+if [[ "$#" -eq 0 ]]; then
+  exec codex --profile "$PROFILE"
 fi
 
-exec ollama run "$MODEL"
+case "$1" in
+  exec|review|login|logout|mcp|plugin|mcp-server|app-server|remote-control|completion|update|doctor|sandbox|debug|apply|resume|archive|unarchive|fork|cloud|exec-server|features|help|-h|--help|--version|-V|--*)
+    exec codex --profile "$PROFILE" "$@"
+    ;;
+  *)
+    exec codex exec --skip-git-repo-check --profile "$PROFILE" "$*"
+    ;;
+esac

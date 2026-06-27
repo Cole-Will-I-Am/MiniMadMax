@@ -14,10 +14,12 @@ The top-level installer also creates this model and installs the `codex-nemotron
 
 ## Run
 
-Clean one-shot prompt through the API:
+Codex profile wrapper:
 
 ```bash
+codex-nemotron
 codex-nemotron "Summarize the current VPS model inventory."
+codex-nemotron exec "inspect this repo"
 ```
 
 Direct Ollama CLI:
@@ -26,7 +28,7 @@ Direct Ollama CLI:
 ollama run codex-nemotron:latest
 ```
 
-Nemotron may emit visible `Thinking...` output in the plain Ollama CLI. For automation, use the wrapper or API with `think:false`.
+Use the API example below when you need raw model output outside Codex.
 
 ## API Example
 
